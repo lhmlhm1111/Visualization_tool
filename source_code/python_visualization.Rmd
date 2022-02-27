@@ -1,0 +1,432 @@
+---
+title: "Matplotlib"
+author: "HakminLee"
+date: '`r format(Sys.Date())`'
+output: 
+  html_document:
+      code_folding: hide
+      toc: true
+      toc_float: true
+      toc_collapsed: true
+      toc_depth: 3
+      theme: flatly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T, message=F, warning=F)
+```
+
+본 자료는 연세대학교 DA 대학원에서 **김정은 교수님**께서 진행하신 **컴퓨터 프로그래밍** 과목의 수업 내용을 참고하여 제작
+
+---
+
+## Matplotlib 개요
+
+---
+
+Python에서는 `matplotlib`이라는 라이브러리를 통해 시각화를 할 수 있다.  
+시각화란 데이터를 그래프로 표현하는 것을 의미한다.  
+  
+먼저 가장 간단한 꺾은선, 막대, 점 그래프를 그려본다.  
+
+```{python}
+import matplotlib.pyplot as plt
+plt.rcParams['axes.unicode_minus'] = False
+
+data = [i for i in range(10)]
+index = list('abcdefghij')
+
+plt.figure()
+plt.title('꺾은선 그래프')
+plt.plot(index, data)
+plt.show()
+```
+
+```{python}
+plt.figure()
+plt.title('막대 그래프')
+plt.bar(index, data)
+plt.show()
+```
+
+```{python}
+plt.figure()
+plt.title('점 그래프')
+plt.scatter(index, data)
+plt.show()
+```
+
+이번엔 세 가지 그래프를 한 화면에 배치 할 수 있도록 그려보자. 먼저 영역을 분할해본다.
+```{python}
+fig = plt.figure() #그래프의 바탕(도화지)이 되는 figure 객체 생성
+ax1 = fig.add_subplot(2,2,1) #2x2 구간 중 1번째 index에 subplot 생성
+ax2 = fig.add_subplot(2,2,2) #2x2 구간 중 2번째 index에 subplot 생성
+ax4 = fig.add_subplot(2,2,4) #2x2 구간 중 4번째 index에 subplot 생성
+plt.show()
+```
+
+각각 분할한 영역에 그래프를 추가해보자.
+```{python}
+fig = plt.figure() #그래프의 바탕(도화지)이 되는 figure 객체 생성
+ax1 = fig.add_subplot(2,2,1) #2x2 구간 중 1번째 index에 subplot 생성
+ax2 = fig.add_subplot(2,2,2) #2x2 구간 중 2번째 index에 subplot 생성
+ax4 = fig.add_subplot(2,2,4) #2x2 구간 중 4번째 index에 subplot 생성
+ax1.plot(index, data)
+ax2.bar(index, data)
+ax4.scatter(index, data)
+plt.show()
+```
+
+## 상태 기반 인터페이스 vs 객체 지향 인터페이스
+
+---
+
+matplotlib은 서로 다른 두 가지의 인터페이스를 제공한다. 두 방법은 혼용이 가능하다.  
+
+### 상태기반 인터페이스 (함수명령문형)
+
+---
+
+위의 개요에서 그래프를 그렸던 방식이 **상태기반 인터페이스**이다. **상태기반 인터페이스**는 명시적으로 그래프 객체를 선언하지 않고 묵시적으로 현재까지의 상태를 추적 및 관리하고 저장한다. 일일이 하나하나 지정해 줄 필요가 없다는 점에서 간편하나 복잡한 그래프를 만들 때 제약이 따른다. 그래프를 그릴 때 `plt.함수명(인수)` 형태의 함수 명령문을 사용하므로 **함수명령문형 인터페이스**라고도 한다.
+
+### 객체지향 인터페이스
+
+---
+
+**객체지향 인터페이스**는 명시적으로 그래프 객체를 선언하여 변수에 할당하고, 해당 객체의 메소드를 통해 그래프를 그린다. Python 문법과 호출하는 방식이 유사하므로 파이썬 이용자에게 좀 더 직관적인 방법이다. 객체를 일일이 지정해줘야하는 번거로움이 있지만 복잡한 그래프를 그릴 때 헷갈림이 덜하고 유용하다. `객체.메소드(매개변수)`의 형태로 사용한다.  
+
+아래는 **객체지향 인터페이스**로 그래프를 그린 예시이다.
+```{python}
+fig, ax = plt.subplots(nrows = 2, ncols = 2, 
+                        sharex = True, sharey= True, figsize = (6,6)) #subplot 객체 선언 (ax)
+ax[0][0].plot(index, data)
+ax[0][1].bar(index, data)
+ax[1][1].scatter(index, data)
+plt.show()
+```
+
+## 색상, 선스타일, 마커
+
+---
+
+먼저 하나의 서브 플롯에 여러개의 꺾은선 그래프를 그리고 색상, 선 스타일, 마커를 추가해보자.
+```{python}
+fig, ax = plt.subplots(figsize = (4,4))
+index = list('abcdefghij')
+value1 = [i for i in range(10)]
+value2 = [i for i in range(2, 22, 2)]
+value3 = [i for i in range(3, 33, 3)]
+
+ax.plot(index, value1, color = 'cyan', linestyle = '--', marker = 'o')
+ax.plot(index, value2, color = 'magenta', linestyle = ':', marker = '^')
+ax.plot(index, value3, color = 'yellow', linestyle = '-.', marker = 's')
+plt.show()
+```
+
+---
+
+다음과 같이 축약형을 쓰거나 스타일 사전을 만들어서 간편하게 전달하는 것도 가능하다.
+```{python}
+fig, ax = plt.subplots(1, 2, figsize = (6,4), sharey=True)
+style1 = {'color':'cyan', 'linestyle':'--', 'marker':'o'}
+style2 = {'color':'magenta', 'linestyle':':', 'marker':'^'}
+style3 = {'color':'yellow', 'linestyle':'-.', 'marker':'s'}
+
+#사전 사용
+ax[0].plot(index, value1, **style1)
+ax[0].plot(index, value2, **style2)
+ax[0].plot(index, value3, **style3)
+
+#축약형
+ax[1].plot(index, value1, 'co--')
+ax[1].plot(index, value2, 'm^:')
+ax[1].plot(index, value3, 'ys-.')
+plt.show()
+```
+
+## 범례(legend), 제목
+
+---
+
+범례와 제목을 추가해보자
+
+```{python}
+fig, ax = plt.subplots(1, 2, figsize = (6,4), sharey=True)
+
+ax[0].plot(index, value1, 'co--', label = 'value1')
+ax[0].plot(index, value2, 'm^:', label = 'value2')
+ax[0].plot(index, value3, 'ys-.', label = 'value3')
+ax[0].set_title('범례위치 좌상단')
+ax[0].legend(loc='best')
+
+ax[1].plot(index, value1, 'co--', label = 'value1')
+ax[1].plot(index, value2, 'm^:', label = 'value2')
+ax[1].plot(index, value3, 'ys-.', label = 'value3')
+ax[1].set_title('범례위치 가운데 상단')
+ax[1].legend(loc='upper center') #범례 위치 조정
+
+fig.suptitle('전체 제목')
+plt.show()
+```
+
+## x,y 축
+
+---
+
+x, y축에 제목을 부여하고 눈금별 항목명을 지정해보자
+```{python}
+import random
+value4 = [base*0.1 + random.random() for base in range(90)]
+
+fig, ax = plt.subplots(1,1,figsize = (6,3))
+ax.plot(value4)
+
+ax.set_xticks([0,30,60,90]) #눈금폭 지정
+ax.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr']) #눈금마다 표시할 레이블명
+
+ax.set_xlabel('Month') #x축 제목
+ax.set_ylabel('Accident') #y축 제목
+
+plt.show()
+```
+
+---
+
+단위가 크게 다른 두 개의 데이터를 한 그래프에 표시할 때 y축을 두개 사용할 수 있다.
+
+```{python}
+value5 = [base + random.random()*5 for base in range(90,0,-1)]
+
+fig, ax = plt.subplots(1,1,figsize = (6,3))
+ax.plot(value4)
+
+ax.set_xticks([0,30,60,90]) #눈금폭 지정
+ax.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr']) #눈금마다 표시할 레이블명
+
+ax.set_xlabel('Month') #x축 제목
+ax.set_ylabel('Accident', color='blue') #y축 제목
+
+ax2 = ax.twinx() #제 2의 축 생성
+ax2.plot(value5, color = 'red')
+ax2.set_ylabel('Surprise', color='red')
+
+plt.show()
+```
+
+---
+
+눈금의 척도를 log scale로 변경하는 것도 가능하다.
+
+```{python}
+value6 = [10 ** (base*0.1) for base in range(90)]
+fig, ax = plt.subplots(1, 2, figsize = (8,3))
+
+for axe in ax.flat:
+    axe.plot(value6)
+    axe.set_xticks([0, 30, 60, 90])
+    axe.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr'])
+    axe.set_xlabel('Month')
+    axe.set_ylabel('Accident')
+
+ax[1].set_yscale('log')
+ax[0].set_title('Normal Scale')
+ax[1].set_title('Log Scale')
+
+plt.show()
+```
+
+## 주석 달기 (Annotate)
+
+---
+
+그래프에서 강조하고 싶은 부분에 주석을 다는 것도 가능하다.
+
+```{python}
+fig, ax = plt.subplots(1,1,figsize = (6,3))
+ax.plot(value4)
+
+ax.set_xticks([0,30,60,90]) #눈금폭 지정
+ax.set_xticklabels(['Jan', 'Feb', 'Mar', 'Apr']) #눈금마다 표시할 레이블명
+
+ax.set_xlabel('Month') #x축 제목
+ax.set_ylabel('Accident') #y축 제목
+
+ax.annotate('Feb start', #출력할 문자열
+            xy = (30, value4[30]), #화살촉 위치
+            xytext = (30, value4[30]+2.5), #문자열 위치
+            arrowprops = dict(facecolor = 'black', headwidth = 4,
+                              width = 2, headlength = 4), #화살표 속성
+            horizontalalignment = 'left', # 문자열 좌우정렬
+            verticalalignment = 'top' # 문자열 상하정렬
+            )
+            
+plt.show()   
+```
+
+## 서브플롯 간 간격
+
+---
+
+서브플롯 간의 간격을 조정할 수 있다.
+
+```{python}
+#정규분포를 따르는 100개의 난수를 4묶음 생성 
+normal_dist = [[random.gauss(0, 1) for _ in range(100)] for _ in range(4)]
+
+fig, ax = plt.subplots(2,2, figsize = (6,6), sharex = True, sharey = True)
+
+for axe, ndist in zip(ax.flat, normal_dist):
+    axe.hist(ndist)
+
+#서브플롯 간 여백을 제거    
+plt.subplots_adjust(wspace = 0, hspace = 0)
+plt.show()
+```
+
+## 막대 그래프
+
+---
+
+도시별 과일 소비량을 막대 그래프로 나타내보자
+
+```{python}
+Seoul = [800, 600, 900]
+Busan = [900, 500, 870]
+Fruit = ['grape', 'orange', 'apple']
+
+fig, ax = plt.subplots(1,3, figsize=(10, 3))
+
+#stack bar chart
+ax[0].bar(Fruit, Seoul, label = 'Seoul')
+ax[0].bar(Fruit, Busan, label = 'Busan')
+ax[0].set_title('Stacked Bar')
+ax[0].set_ylabel('Fruit Sales')
+ax[0].legend(loc = 'lower center')
+
+#grouped bar chart
+width = 0.35
+x0 = [x for x in range(len(Fruit))]
+x1 = [x - width/2 for x in range(len(Fruit))]
+x2 = [x + width/2 for x in range(len(Fruit))]
+
+ax[1].bar(x1, Seoul, width, label = 'Seoul')
+ax[1].bar(x2, Busan, width, label = 'Busan')
+ax[1].set_title('Grouped Bar')
+ax[1].set_xticks(x0)
+ax[1].set_xticklabels(Fruit)
+
+# Horizontal Bar
+extended_label = [city + '_' + fr for city in ['Seoul', 'Busan'] for fr in Fruit]
+
+ax[2].barh(extended_label, Seoul + Busan)
+ax[2].set_title('Horizontal Bar')
+plt.subplots_adjust(hspace= 0.3, wspace = 0.8)
+plt.show()
+```
+
+## 꺾은선 그래프
+
+---
+
+꺾은선 그래프는 시간의 흐름에 따른 변화 비교에 유용하다. 연도별 도시의 전력 소비 변화량을 꺾은선 그래프로 나타내자
+
+```{python}
+Seoul = [135.2, 108.0, 119.5, 144.8, 137.4]
+Busan = [33.2, 113.3, 118.6, 78.4, 153.7]
+year = [1990, 1991, 1992, 1993, 1994]
+
+fig, ax = plt.subplots(figsize=(6,3))
+
+ax.plot(year, Seoul, label = 'Seoul', color = 'Green', marker = 'o', linestyle = ':')
+ax.plot(year, Busan, label = 'Busan', color = 'Red', marker = '+', linestyle = '--')
+ax.legend(loc = 'lower right')
+ax.set_title('Line Chart')
+ax.set_xticks(year)
+
+plt.show()
+```
+
+## 히스토그램
+
+---
+
+히스토그램은 데이터의 분포를 살펴보는데 유용하다. 예를 들어 히스토그램을 그려봤을 때 양봉 분포가 나타난다면 서로 다른 두 개의 분포가 혼재되어 있다고 예상할 수 있다.  
+아래의 예시는 영어를 모국어로 쓰는 학생 집단과 그렇지 않은 학생 집단의 영어 점수 분포이다.
+
+```{python}
+random.seed = 42
+#영어가 모국어가 아닌 학생 200명의 영어 점수 (평균 72, 편차 8)
+eng = [random.gauss(72, 8) for _ in range(200)]
+eng = [i if i < 100 else 100 for i in eng]
+eng = [i if i > 0 else 0 for i in eng]
+
+#영어가 모국어인 학생 100명의 영어 점수 (평균 92, 편차 4)
+eng2 = [random.gauss(92, 4) for _ in range(100)]
+eng2 = [i if i < 100 else 100 for i in eng2]
+eng2 = [i if i > 0 else 0 for i in eng2]
+
+tot = eng + eng2
+
+fig, ax = plt.subplots(figsize = (6, 4))
+ax.hist(tot, bins=20)
+ax.set_title('All Students')
+plt.show()
+```
+
+---
+
+위 분포를 분리해서 히스토그램으로 나타내면 명확하게 두 집단이 나타남을 확인할 수 있다.
+
+```{python}
+
+fig, ax = plt.subplots(1, 2, figsize = (10,4), sharex= True)
+ax[0].set_title('Not English Mothertongue')
+ax[0].hist(eng, bins=20)
+
+ax[1].set_title('English Mothertongue')
+ax[1].hist(eng2, bins=20)
+
+for axe in ax.flat:
+  axe.set_xlabel('영어 점수')
+  axe.set_ylabel('학생 수')
+plt.show()
+```
+
+## 박스플롯
+
+---
+
+여러 집단 간의 분포를 비교하기 위해 박스플롯을 그릴 수 있다. 앞에서 봤던 영어 모국어 그룹과 영어 외국어 그룹 간의 영어 점수 분포를 박스플롯으로 표현해보자.
+
+```{python}
+fig, ax = plt.subplots(figsize = (4, 4))
+
+ax.boxplot([eng, eng2])
+
+ax.set_xticklabels(['영어 외국어', '영어 모국어'])
+ax.set_title('그룹 간 분포 비교')
+
+plt.show()
+```
+
+## 산포도 (scatter plot)
+
+---
+
+산포도는 변수간 관계를 관찰하기 위해 사용한다.
+
+```{python}
+size = [(168, 63), (172, 67), (183, 72), (158, 57), (175, 69),
+        (172, 59), (178, 72), (182, 77), (168, 62), (163, 56)]
+        
+height = [h for h,w in size]
+weight = [w for h,w in size]
+
+fig, ax = plt.subplots(figsize = (5, 5))
+ax.scatter(height, weight)
+
+ax.set_xlabel('키')
+ax.set_ylabel('몸무게')
+
+plt.show()
+```
